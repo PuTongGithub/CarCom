@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.carcom.dao.MessageMapper">
+	<resultMap id="BaseResultMap" type="com.carcom.entity.Message">
+		<id column="msg_id" property="msgId" />
+        <result column="send_user_id" property="sendUserId" />
+        <result column="receive_user_id" property="reciveUserId" />
+		<result column="send_time" property="sendTime" />
+		<result column="_content" property="content" />
+		<result column="_status" property="status" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		msg_id, send_user_id, receive_user_id,
+		send_time, _content, _status
+	</sql>
+	<insert id="insertSelective" parameterType="com.carcom.entity.Message" >
+    insert into messages
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="sendUserId != null" >
+        send_user_id,
+      </if>
+      <if test="reciveUserId != null" >
+        receive_user_id,
+      </if>
+      <if test="sendTime != null" >
+        send_time,
+      </if>
+      <if test="content != null" >
+        _content,
+      </if>
+      <if test="status != null" >
+        _status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="sendUserId != null" >
+        #{sendUserId},
+      </if>
+      <if test="reciveUserId != null" >
+        #{reciveUserId},
+      </if>
+      <if test="sendTime != null" >
+        #{sendTime},
+      </if>
+      <if test="content != null" >
+        #{content},
+      </if>
+      <if test="status != null" >
+        #{status},
+      </if>
+    </trim>
+  </insert>
+  <select id="selectMessages" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from messages
+  </select>
+  <select id="selectByMsgId" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select
+    <include refid="Base_Column_List" />
+    from messages
+    where msg_id = #{msgId}
+  </select>
+  <select id="searchMessageByTime" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from messages
+    where (send_user_id = #{arg0} and receive_user_id = #{arg1})
+    or (send_user_id = #{arg1} and receive_user_id = #{arg0})
+    order by send_time desc
+    limit 5
+  </select>
+</mapper>

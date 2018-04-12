@@ -1,0 +1,32 @@
+create database carcomdb
+character set utf8
+collate utf8_general_ci;
+
+use carcomdb;
+
+create table users(
+user_id int not null auto_increment,
+user_name varchar(50) not null,
+car_number varchar(50) not null,
+user_status int not null default 0,
+primary key(user_id)
+) engine=InnoDB default charset=utf8;
+
+create table messages(
+msg_id int not null auto_increment,
+send_user_id int not null,
+receive_user_id int not null,
+send_time timestamp not null default current_timestamp,
+_content varchar(100) not null,
+_status int not null default 0,
+primary key(msg_id)
+) engine=InnoDB default charset=utf8;
+
+
+create table contacts(
+contact_id int not null auto_increment,
+main_user_id int not null,
+contact_user_id int not null,
+_status int not null default 0,
+primary key(contact_id)
+) engine=InnoDB default charset=utf8;

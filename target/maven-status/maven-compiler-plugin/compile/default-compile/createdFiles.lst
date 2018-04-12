@@ -1,3 +1,11 @@
 com\carcom\Application.class
-com\carcom\config\WebSocketConfig.class
+com\carcom\dao\UserMapper.class
+com\carcom\entity\User.class
+com\carcom\entity\Contact.class
 com\carcom\socket\MyWebSocket.class
+com\carcom\dao\ContactMapper.class
+com\carcom\config\WebSocketConfig.class
+com\carcom\dao\MessageMapper.class
+com\carcom\controller\ComController.class
+com\carcom\service\ComService.class
+com\carcom\entity\Message.class

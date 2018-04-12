@@ -1,3 +1,11 @@
+D:\code\car\CarCom\src\main\java\com\carcom\entity\User.java
 D:\code\car\CarCom\src\main\java\com\carcom\config\WebSocketConfig.java
+D:\code\car\CarCom\src\main\java\com\carcom\dao\MessageMapper.java
+D:\code\car\CarCom\src\main\java\com\carcom\service\ComService.java
+D:\code\car\CarCom\src\main\java\com\carcom\dao\ContactMapper.java
+D:\code\car\CarCom\src\main\java\com\carcom\entity\Message.java
 D:\code\car\CarCom\src\main\java\com\carcom\Application.java
+D:\code\car\CarCom\src\main\java\com\carcom\controller\ComController.java
 D:\code\car\CarCom\src\main\java\com\carcom\socket\MyWebSocket.java
+D:\code\car\CarCom\src\main\java\com\carcom\dao\UserMapper.java
+D:\code\car\CarCom\src\main\java\com\carcom\entity\Contact.java

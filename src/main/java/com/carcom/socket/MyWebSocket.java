@@ -1,7 +1,7 @@
 package com.carcom.socket;
 
 import java.io.IOException;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -15,28 +15,19 @@ import org.springframework.stereotype.Component;
 @ServerEndpoint(value = "/websocket")
 @Component
 public class MyWebSocket {
-    //静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
-    private static int onlineCount = 0;
-
-    //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
-    private static CopyOnWriteArraySet<MyWebSocket> webSocketSet = new CopyOnWriteArraySet<MyWebSocket>();
+    //concurrent包的线程安全Map，用来存放每个客户端对应的MyWebSocket对象。
+    private static ConcurrentHashMap<Integer, MyWebSocket> webSocketMap = new ConcurrentHashMap<>();
 
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session;
+    
+    private Integer userId;
 
     /**
      * 连接建立成功调用的方法*/
     @OnOpen
     public void onOpen(Session session) {
         this.session = session;
-        webSocketSet.add(this);     //加入set中
-        addOnlineCount();           //在线数加1
-        System.out.println("有新连接加入！当前在线人数为" + getOnlineCount());
-        try {
-            sendMessage("hi");
-        } catch (IOException e) {
-            System.out.println("IO异常");
-        }
     }
 
     /**
@@ -44,27 +35,37 @@ public class MyWebSocket {
      */
     @OnClose
     public void onClose() {
-        webSocketSet.remove(this);  //从set中删除
-        subOnlineCount();           //在线数减1
-        System.out.println("有一连接关闭！当前在线人数为" + getOnlineCount());
+    	webSocketMap.remove(userId);
     }
 
     /**
      * 收到客户端消息后调用的方法
      *
-     * @param message 客户端发送过来的消息*/
+     * @param message 客户端发送过来的消息
+     * @throws IOException */
     @OnMessage
-    public void onMessage(String message, Session session) {
-        System.out.println("来自客户端的消息:" + message);
+    public void onMessage(String message, Session session) throws IOException {
+        String[] msg = message.split("\\|");
+        if(msg[0].equals("UserId")) {
+        	userId = Integer.valueOf(msg[1]);
+        	webSocketMap.put(userId, this);
+        }
+        else if(msg[0].equals("Message")) {
+        	Integer reciveUserId = Integer.valueOf(msg[2]);
+        	MyWebSocket socket = webSocketMap.get(reciveUserId);
+        	if(socket != null) {
+        		socket.sendMessage(message);
+        	}
+        }
 
-        //群发消息
+        /*//群发消息
         for (MyWebSocket item : webSocketSet) {
             try {
                 item.sendMessage(message);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
     @OnError
@@ -77,31 +78,5 @@ public class MyWebSocket {
     public void sendMessage(String message) throws IOException {
         this.session.getBasicRemote().sendText(message);
         //this.session.getAsyncRemote().sendText(message);
-    }
-
-
-    /**
-     * 群发自定义消息
-     * */
-    public static void sendInfo(String message) throws IOException {
-        for (MyWebSocket item : webSocketSet) {
-            try {
-                item.sendMessage(message);
-            } catch (IOException e) {
-                continue;
-            }
-        }
-    }
-
-    public static synchronized int getOnlineCount() {
-        return onlineCount;
-    }
-
-    public static synchronized void addOnlineCount() {
-        MyWebSocket.onlineCount++;
-    }
-
-    public static synchronized void subOnlineCount() {
-        MyWebSocket.onlineCount--;
     }
 }
